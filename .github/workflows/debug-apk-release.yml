@@ -1,0 +1,70 @@
+name: Build Debug APK
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-debug-apk:
+    name: Build and release debug APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK packages
+        run: |
+          sdkmanager \
+            "platforms;android-36" \
+            "build-tools;36.0.0" \
+            "cmake;3.22.1" \
+            "ndk;28.2.13676358"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build debug APK
+        run: ./gradlew assembleDebug
+
+      - name: Prepare release metadata
+        id: release
+        shell: bash
+        run: |
+          tag_name="debug-${GITHUB_RUN_NUMBER}"
+          release_name="Debug APK ${GITHUB_RUN_NUMBER}"
+          apk_source="app/build/outputs/apk/debug/app-debug.apk"
+          apk_name="LlamaDroid-debug-${GITHUB_RUN_NUMBER}.apk"
+
+          cp "${apk_source}" "${apk_name}"
+
+          {
+            echo "tag_name=${tag_name}"
+            echo "release_name=${release_name}"
+            echo "apk_name=${apk_name}"
+          } >> "${GITHUB_OUTPUT}"
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.release.outputs.tag_name }}
+          name: ${{ steps.release.outputs.release_name }}
+          body: |
+            Debug APK built from ${{ github.sha }}.
+          files: ${{ steps.release.outputs.apk_name }}
+          prerelease: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
