@@ -1,0 +1,36 @@
+<resources>
+    <string name="app_name">LlamaDroid</string>
+    <string name="privacy_onboarding_title">Sohbetleriniz bu cihazda kalır.</string>
+    <string name="privacy_onboarding_body">Bir GGUF modeli içe aktarın ve çevrimdışı sohbet edin. LlamaDroid hesap, analiz veya ağ izni kullanmaz.</string>
+    <string name="chat">Sohbet</string>
+    <string name="conversations">Sohbetler</string>
+    <string name="models">Modeller</string>
+    <string name="settings">Ayarlar</string>
+    <string name="benchmark">Benchmark</string>
+    <string name="new_chat">Yeni sohbet</string>
+    <string name="message_hint">LlamaDroid'e mesaj yazın</string>
+    <string name="send">Gönder</string>
+    <string name="stop">Durdur</string>
+    <string name="regenerate">Yeniden üret</string>
+    <string name="copy">Kopyala</string>
+    <string name="edit">Düzenle</string>
+    <string name="import_model">GGUF içe aktar</string>
+    <string name="active_model">Aktif model</string>
+    <string name="no_model_title">Model seçilmedi</string>
+    <string name="no_model_body">Yerel çıkarım için cihaz depolamasından bir GGUF modeli içe aktarın.</string>
+    <string name="load_model">Modeli yükle</string>
+    <string name="unload_model">Boşalt</string>
+    <string name="privacy">Gizlilik</string>
+    <string name="generation">Üretim</string>
+    <string name="performance">Performans</string>
+    <string name="appearance">Görünüm</string>
+    <string name="open">Aç</string>
+    <string name="use">Kullan</string>
+    <string name="delete">Sil</string>
+    <string name="run_benchmark">Benchmark çalıştır</string>
+    <string name="benchmark_idle">Model yüklendikten sonra kısa bir benchmark çalıştırın.</string>
+    <string name="benchmark_running">Benchmark çalışıyor...</string>
+    <string name="benchmark_no_metrics">Benchmark metrik üretmeden tamamlandı.</string>
+    <string name="select_model_first">Önce bir model seçin.</string>
+    <string name="import_model_first">Önce bir GGUF modeli içe aktarın ve seçin.</string>
+</resources>

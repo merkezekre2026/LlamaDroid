@@ -1,0 +1,6 @@
+<resources>
+    <style name="Theme.LlamaDroid" parent="android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:navigationBarColor">#FAFAF8</item>
+    </style>
+</resources>
