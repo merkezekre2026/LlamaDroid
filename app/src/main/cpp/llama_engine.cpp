@@ -30,6 +30,7 @@ std::string LlamaEngineNative::load_model(const std::string &path, const LoadCon
     if (!model_) {
         return "Unable to load GGUF model. Check that the file is valid and the device has enough RAM.";
     }
+    vocab_ = llama_model_get_vocab(model_);
 
     llama_context_params ctx_params = llama_context_default_params();
     ctx_params.n_ctx = static_cast<uint32_t>(config.context_size);
@@ -41,6 +42,7 @@ std::string LlamaEngineNative::load_model(const std::string &path, const LoadCon
     if (!ctx_) {
         llama_model_free(model_);
         model_ = nullptr;
+        vocab_ = nullptr;
         return "Unable to create llama.cpp context. Try a smaller context length or model.";
     }
 
@@ -63,7 +65,7 @@ std::string LlamaEngineNative::generate(
 
     std::vector<llama_token> prompt_tokens(prompt.size() + 8);
     int token_count = llama_tokenize(
-        model_,
+        vocab_,
         prompt.c_str(),
         static_cast<int32_t>(prompt.size()),
         prompt_tokens.data(),
@@ -74,7 +76,7 @@ std::string LlamaEngineNative::generate(
     if (token_count < 0) {
         prompt_tokens.resize(static_cast<size_t>(-token_count));
         token_count = llama_tokenize(
-            model_,
+            vocab_,
             prompt.c_str(),
             static_cast<int32_t>(prompt.size()),
             prompt_tokens.data(),
@@ -88,7 +90,7 @@ std::string LlamaEngineNative::generate(
     }
     prompt_tokens.resize(static_cast<size_t>(token_count));
 
-    llama_kv_cache_clear(ctx_);
+    llama_memory_clear(llama_get_memory(ctx_), true);
     const int64_t prompt_start = now_ms();
     llama_batch batch = llama_batch_get_one(prompt_tokens.data(), token_count);
     if (llama_decode(ctx_, batch) != 0) {
@@ -118,7 +120,7 @@ std::string LlamaEngineNative::generate(
             break;
         }
         last_token = llama_sampler_sample(sampler, ctx_, -1);
-        if (llama_token_is_eog(model_, last_token)) {
+        if (llama_vocab_is_eog(vocab_, last_token)) {
             break;
         }
         llama_sampler_accept(sampler, last_token);
@@ -156,15 +158,16 @@ void LlamaEngineNative::unload() {
         llama_model_free(model_);
         model_ = nullptr;
     }
+    vocab_ = nullptr;
     cancel_requested_ = false;
 }
 
 std::string LlamaEngineNative::token_to_piece(llama_token token) const {
     std::vector<char> buffer(32);
-    int length = llama_token_to_piece(model_, token, buffer.data(), static_cast<int32_t>(buffer.size()), 0, true);
+    int length = llama_token_to_piece(vocab_, token, buffer.data(), static_cast<int32_t>(buffer.size()), 0, true);
     if (length < 0) {
         buffer.resize(static_cast<size_t>(-length));
-        length = llama_token_to_piece(model_, token, buffer.data(), static_cast<int32_t>(buffer.size()), 0, true);
+        length = llama_token_to_piece(vocab_, token, buffer.data(), static_cast<int32_t>(buffer.size()), 0, true);
     }
     if (length <= 0) {
         return "";

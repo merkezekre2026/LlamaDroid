@@ -25,6 +25,7 @@ private:
     std::mutex mutex_;
     std::atomic_bool cancel_requested_{false};
     llama_model *model_ = nullptr;
+    const llama_vocab *vocab_ = nullptr;
     llama_context *ctx_ = nullptr;
 
     std::string token_to_piece(llama_token token) const;
