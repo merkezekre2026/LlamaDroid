@@ -8,7 +8,7 @@
     <string name="settings">Ayarlar</string>
     <string name="benchmark">Benchmark</string>
     <string name="new_chat">Yeni sohbet</string>
-    <string name="message_hint">LlamaDroid'e mesaj yazın</string>
+    <string name="message_hint">LlamaDroid\'e mesaj yazın</string>
     <string name="send">Gönder</string>
     <string name="stop">Durdur</string>
     <string name="regenerate">Yeniden üret</string>
