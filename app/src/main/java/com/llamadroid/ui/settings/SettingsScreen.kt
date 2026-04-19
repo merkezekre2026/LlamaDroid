@@ -2,6 +2,7 @@ package com.llamadroid.ui.settings
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -86,7 +87,7 @@ fun SettingsScreen(graph: AppGraph, contentPadding: PaddingValues) {
 }
 
 @Composable
-private fun Section(title: String, content: @Composable Column.() -> Unit) {
+private fun Section(title: String, content: @Composable ColumnScope.() -> Unit) {
     ElevatedCard(Modifier.fillMaxWidth()) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Text(title, style = MaterialTheme.typography.titleMedium)
