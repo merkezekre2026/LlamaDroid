@@ -7,6 +7,8 @@ import com.llamadroid.domain.inference.ModelLoadConfig
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.awaitClose
@@ -25,6 +27,7 @@ class LlamaNativeEngine(
     private val mutex = Mutex()
     private val handle: Long = LlamaNativeBindings.createEngine()
     private val mutableState = MutableStateFlow<EngineState>(EngineState.Idle)
+    private val scope = CoroutineScope(dispatcher + SupervisorJob())
 
     override val state: StateFlow<EngineState> = mutableState
 
@@ -68,7 +71,7 @@ class LlamaNativeEngine(
             }
         }
 
-        val job = CoroutineScope(dispatcher).launch {
+        val job = scope.launch {
             mutex.withLock {
                 mutableState.value = EngineState.Generating
                 val error = LlamaNativeBindings.generate(handle, prompt, params, callback)
@@ -105,6 +108,7 @@ class LlamaNativeEngine(
         mutex.withLock {
             LlamaNativeBindings.release(handle)
             mutableState.value = EngineState.Idle
+            scope.cancel()
         }
     }
 }

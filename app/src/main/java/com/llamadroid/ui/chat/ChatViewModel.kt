@@ -188,10 +188,9 @@ class ChatViewModel(private val graph: AppGraph) : ViewModel() {
         viewModelScope.launch {
             val chatId = selectedChatId.value ?: return@launch
             val messages = graph.chatRepository.messages(chatId)
-            val lastAssistant = messages.lastOrNull { it.role == MessageRole.Assistant } ?: return@launch
-            graph.chatRepository.deleteFrom(chatId, lastAssistant.id)
-            messageVersion.value++
             val lastUser = messages.lastOrNull { it.role == MessageRole.User } ?: return@launch
+            graph.chatRepository.deleteFrom(chatId, lastUser.id)
+            messageVersion.value++
             draft.value = lastUser.content
             send()
         }
