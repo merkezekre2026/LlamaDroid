@@ -59,8 +59,6 @@ fun SettingsScreen(graph: AppGraph, contentPadding: PaddingValues) {
                     scope.launch { graph.settingsRepository.applyProfile(InferenceProfile.valueOf(selected)) }
                 }
                 SettingSlider("Temperature", settings.temperature, 0f, 1.5f) { value -> update { it.copy(temperature = value) } }
-            }
-            Section(stringResource(R.string.generation)) {
                 SettingSlider("Top P", settings.topP, 0.1f, 1f) { value -> update { it.copy(topP = value) } }
                 SettingSlider("Min P", settings.minP, 0f, 0.3f) { value -> update { it.copy(minP = value) } }
                 SettingSlider("Repeat penalty", settings.repeatPenalty, 0.8f, 1.5f) { value -> update { it.copy(repeatPenalty = value) } }
