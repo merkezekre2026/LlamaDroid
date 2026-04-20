@@ -56,7 +56,7 @@ class ModelsViewModel(private val graph: AppGraph) : ViewModel() {
                     warning.value = it.warning
                     graph.modelRepository.setActiveModel(it.model.id)
                 }
-                .onFailure { error.value = it.message }
+                .onFailure { error.value = it.message ?: "Import failed (${it.javaClass.simpleName})" }
         }
     }
 

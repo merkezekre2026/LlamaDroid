@@ -25,10 +25,14 @@ class ModelRepository(
 
     suspend fun importModel(uri: Uri): ModelImportResult = withContext(Dispatchers.IO) {
         val resolver = context.contentResolver
-        resolver.takePersistableUriPermission(
-            uri,
-            android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION,
-        )
+        // Some providers (e.g. Downloads, Google Drive) don't grant persistable permissions.
+        // OpenDocument already gives a temporary grant sufficient for the copy below.
+        runCatching {
+            resolver.takePersistableUriPermission(
+                uri,
+                android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION,
+            )
+        }
         val fileName = resolver.displayName(uri) ?: "model-${System.currentTimeMillis()}.gguf"
         require(fileName.lowercase(Locale.US).endsWith(".gguf")) { "Only GGUF files are supported." }
 
@@ -79,10 +83,13 @@ class ModelRepository(
     private fun ContentResolver.displayName(uri: Uri): String? {
         query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { cursor ->
             if (cursor.moveToFirst()) {
-                return cursor.getString(0)
+                val name = cursor.getString(0)
+                if (!name.isNullOrBlank()) return name
             }
         }
-        return uri.lastPathSegment
+        // lastPathSegment for content URIs is often an opaque ID, not a filename.
+        // Return null so the caller falls back to a safe timestamped name.
+        return null
     }
 
     private fun sanitizeFileName(name: String): String = name.replace(Regex("[^A-Za-z0-9._-]"), "_")
